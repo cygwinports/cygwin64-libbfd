@@ -1,0 +1,36 @@
+CROSS_HOST="x86_64-pc-cygwin"
+inherit cross
+
+NAME="cygwin64-libbfd"
+VERSION=20130213
+RELEASE=1
+CATEGORY="Devel"
+SUMMARY="BFD for Cygwin 64bit toolchain"
+HOMEPAGE="http://www.gnu.org/software/binutils/"
+SRC_DIR="binutils-${VERSION}"
+case ${VERSION} in
+20[1-9][0-9][01][0-9][0-3][0-9])
+	SRC_URI="mirror://sourceware/binutils/snapshots/binutils.tar.bz2"
+	SRC_DIR="binutils-";;
+*.*.[5-9][0-9])
+	SRC_URI="mirror://sourceware/binutils/snapshots/binutils-${VERSION}.tar.bz2" ;;
+*)	SRC_URI="mirror://gnu/binutils/binutils-${VERSION}.tar.bz2" ;;
+esac
+PATCH_URI="
+	ftp://cygwin.com/pub/cygwin/64bit/x86_64-pc-cygwin-binutils-20130213.patch
+	config-rpath.patch
+"
+
+src_compile() {
+	cd ${B}
+	cygconf --enable-64-bit-bfd --without-included-gettext --disable-werror
+	cygmake all-libiberty all-opcodes all-bfd
+}
+
+src_install() {
+	cd ${B}
+	cygmake DESTDIR=${D} install-libiberty install-opcodes install-bfd
+
+	# conflicts with native binutils
+	rm -fr ${D}${CROSS_DATADIR}/{info,locale}/
+}
