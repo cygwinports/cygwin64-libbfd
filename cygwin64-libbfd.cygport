@@ -2,8 +2,8 @@ CROSS_HOST="x86_64-pc-cygwin"
 inherit cross
 
 NAME="cygwin64-libbfd"
-VERSION=2.23.52
-RELEASE=5
+VERSION=2.25.1
+RELEASE=1
 CATEGORY="Devel"
 SUMMARY="BFD for Cygwin 64bit toolchain"
 HOMEPAGE="http://www.gnu.org/software/binutils/"
@@ -13,14 +13,15 @@ case ${VERSION} in
 	SRC_URI="mirror://sourceware/binutils/snapshots/binutils-${VERSION}.tar.bz2" ;;
 *)	SRC_URI="mirror://gnu/binutils/binutils-${VERSION}.tar.bz2" ;;
 esac
-PATCH_URI="
-	02-x86-64-pc32-relocs.patch
-	03-install-libiberty.patch
-"
+
+cygwin64_libbfd_REQUIRES="cygwin64-libiconv cygwin64-gettext cygwin64-zlib"
 
 src_compile() {
 	cd ${B}
-	cygconf --without-included-gettext --enable-install-libiberty --disable-werror
+	cygconf \
+		--enable-install-libiberty \
+		--without-included-gettext \
+		--disable-werror
 	cygmake all-libiberty all-opcodes all-bfd
 }
 
